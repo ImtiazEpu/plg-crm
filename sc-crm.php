@@ -128,6 +128,17 @@
 					}
 				}
 			}
+			//End admin and editor capabilities
+			
+			
+			// Add some custom capabilities to the Author Role
+			$role = get_role('author');
+			$role->add_cap( 'edit_contact' );
+			$role->add_cap( 'edit_contacts' );
+			$role->add_cap( 'publish_contacts' );
+			$role->add_cap( 'read_contact' );
+			$role->add_cap( 'delete_contact' );
+			unset( $role );
 			
 		}
 		// End method plugin_activation
