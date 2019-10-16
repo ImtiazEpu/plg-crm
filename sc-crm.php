@@ -74,8 +74,8 @@
 				'show_ui'       => true,
 				'supports'      => array(
 					'title',
-					'author',
-					'comments',
+					'editor',
+					'thumbnail'
 				),
 			) );
 		}
@@ -107,6 +107,28 @@
 			
 			// Create CRM role and assign the custom capabilities to it
 			add_role( 'crm', __( 'CRM', 'sc-crm' ), $customCaps );
+			
+			
+			
+			// Add custom capabilities to Admin and Editor Roles
+			$roles = array( 'administrator', 'editor' );
+			
+			foreach ( $roles as $roleName ) {
+				$role = get_role( $roleName );
+				
+				// Check role exists
+				if ( is_null( $role ) ) {
+					continue;
+				}
+				
+				foreach ( $customCaps as $capabilities => $enable ) {
+					if ( $enable ) {
+						// Add capability
+						$role->add_cap( $capabilities );
+					}
+				}
+			}
+			
 		}
 		// End method plugin_activation
 		
