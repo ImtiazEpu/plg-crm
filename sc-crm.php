@@ -19,6 +19,7 @@
 		public function __construct() {
 			add_action( 'init', array( $this, 'sc_register_custom_post_type' ) );
 			register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
+			register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivation' ) );
 			add_action( 'plugins_loaded', array( $this, 'sc_load_text_domain' ) );
 		}
 		//End method construct
@@ -109,7 +110,6 @@
 			add_role( 'crm', __( 'CRM', 'sc-crm' ), $customCaps );
 			
 			
-			
 			// Add custom capabilities to Admin and Editor Roles
 			$roles = array( 'administrator', 'editor' );
 			
@@ -132,16 +132,23 @@
 			
 			
 			// Add some custom capabilities to the Author Role
-			$role = get_role('author');
+			$role = get_role( 'author' );
 			$role->add_cap( 'edit_contact' );
 			$role->add_cap( 'edit_contacts' );
 			$role->add_cap( 'publish_contacts' );
 			$role->add_cap( 'read_contact' );
 			$role->add_cap( 'delete_contact' );
 			unset( $role );
-			
 		}
 		// End method plugin_activation
+		
+		/**
+		 * Deactivation hook to unregister our existing Contacts Role
+		 */
+		public function plugin_deactivation() {
+			remove_role( 'crm' );
+		}
+		//end method plugin_deactivation
 		
 		
 		/**
