@@ -16,18 +16,19 @@
 		/**
 		 * ScCrm constructor.
 		 */
-		public function __construct(  ) {
-			add_action('init', array($this, 'sc_register_custom_post_type'));
-			add_action('plugins_loaded', array($this,'sc_load_text_domain'));
+		public function __construct() {
+			add_action( 'init', array( $this, 'sc_register_custom_post_type' ) );
+			register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
+			add_action( 'plugins_loaded', array( $this, 'sc_load_text_domain' ) );
 		}
 		//End method construct
 		
 		/**
 		 * Registers a Custom Post Type called contact
 		 */
-		public function sc_register_custom_post_type(  ) {
-			register_post_type('contact', array(
-				'labels' => array(
+		public function sc_register_custom_post_type() {
+			register_post_type( 'contact', array(
+				'labels'             => array(
 					'name'               => _x( 'Contacts', 'post type general name', 'tuts-crm' ),
 					'singular_name'      => _x( 'Contact', 'post type singular name', 'tuts-crm' ),
 					'menu_name'          => _x( 'Contacts', 'admin menu', 'tuts-crm' ),
@@ -44,50 +45,81 @@
 					'not_found_in_trash' => __( 'No contacts found in Trash.', 'tuts-crm' ),
 				),
 				// Front-end
-				'has-archive' => false,
-				'public' =>false,
-				'publicly_queryable' =>false,
+				'has-archive'        => true,
+				'public'             => true,
+				'publicly_queryable' => false,
 				
 				// Admin
-				'capabilities' => array(
-					'edit_others_posts'     => 'edit_others_contacts',
-					'delete_others_posts'   => 'delete_others_contacts',
-					'delete_private_posts'  => 'delete_private_contacts',
-					'edit_private_posts'    => 'edit_private_contacts',
-					'read_private_posts'    => 'read_private_contacts',
-					'edit_published_posts'  => 'edit_published_contacts',
-					'publish_posts'         => 'publish_contacts',
-					'delete_published_posts'=> 'delete_published_contacts',
-					'edit_posts'            => 'edit_contacts'   ,
-					'delete_posts'          => 'delete_contacts',
-					'edit_post'             => 'edit_contact',
-					'read_post'             => 'read_contact',
-					'delete_post'           => 'delete_contact',
+				'capabilities'       => array(
+					'edit_others_posts'      => 'edit_others_contacts',
+					'delete_others_posts'    => 'delete_others_contacts',
+					'delete_private_posts'   => 'delete_private_contacts',
+					'edit_private_posts'     => 'edit_private_contacts',
+					'read_private_posts'     => 'read_private_contacts',
+					'edit_published_posts'   => 'edit_published_contacts',
+					'publish_posts'          => 'publish_contacts',
+					'delete_published_posts' => 'delete_published_contacts',
+					'edit_posts'             => 'edit_contacts',
+					'delete_posts'           => 'delete_contacts',
+					'edit_post'              => 'edit_contact',
+					'read_post'              => 'read_contact',
+					'delete_post'            => 'delete_contact',
 				),
 				
-				'map_meta_cap' => true,
-				'menu_icon' => 'dashicons-businessman',
+				'map_meta_cap'  => true,
+				'menu_icon'     => 'dashicons-businessman',
 				'menu_position' => 10,
-				'query_var' => true,
-				'show_in_menu' => true,
-				'show_ui' => true,
-				'supports' => array(
+				'query_var'     => true,
+				'show_in_menu'  => true,
+				'show_ui'       => true,
+				'supports'      => array(
 					'title',
 					'author',
 					'comments',
 				),
-			));
+			) );
 		}
 		// End method sc_register_custom_post_type
+		
+		
+		/**
+		 * Activation hook to register a new Role and assign it our Contact Capabilities
+		 */
+		public function plugin_activation() {
+			
+			// Define our custom capabilities
+			$customCaps = array(
+				'edit_others_contacts'      => true,
+				'delete_others_contacts'    => true,
+				'delete_private_contacts'   => true,
+				'edit_private_contacts'     => true,
+				'read_private_contacts'     => true,
+				'edit_published_contacts'   => true,
+				'publish_contacts'          => true,
+				'delete_published_contacts' => true,
+				'edit_contacts'             => true,
+				'delete_contacts'           => true,
+				'edit_contact'              => true,
+				'read_contact'              => true,
+				'delete_contact'            => true,
+				'read'                      => true,
+			);
+			
+			// Create CRM role and assign the custom capabilities to it
+			add_role( 'crm', __( 'CRM', 'sc-crm' ), $customCaps );
+		}
+		// End method plugin_activation
+		
 		
 		/**
 		 * Load text domain
 		 */
-		public function sc_load_text_domain(  ) {
-			load_plugin_textdomain('sc-crm', false, dirname(__FILE__)."/languages");
+		public function sc_load_text_domain() {
+			load_plugin_textdomain( 'sc-crm', false, dirname( __FILE__ ) . "/languages" );
 		}
 		//End method sc_load_text_domain
 		
 		
 	}
+	
 	new ScCrm();
