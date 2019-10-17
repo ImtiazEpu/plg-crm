@@ -11,6 +11,9 @@
 	Domain Path: /languages/
 	*/
 	
+	/**
+	 * Kick-in Class ScCrm
+	 */
 	class ScCrm {
 		
 		/**
@@ -18,11 +21,13 @@
 		 */
 		public function __construct() {
 			add_action( 'init', array( $this, 'sc_register_custom_post_type' ) );
+			add_action( 'init', array( $this, 'sc_register_custom_taxonomy_companies' ) );
 			register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
 			register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivation' ) );
 			add_action( 'plugins_loaded', array( $this, 'sc_load_text_domain' ) );
 		}
 		//End method construct
+		
 		
 		/**
 		 * Registers a Custom Post Type called contact
@@ -30,20 +35,20 @@
 		public function sc_register_custom_post_type() {
 			register_post_type( 'contact', array(
 				'labels'             => array(
-					'name'               => _x( 'Contacts', 'post type general name', 'tuts-crm' ),
-					'singular_name'      => _x( 'Contact', 'post type singular name', 'tuts-crm' ),
-					'menu_name'          => _x( 'Contacts', 'admin menu', 'tuts-crm' ),
-					'name_admin_bar'     => _x( 'Contact', 'add new on admin bar', 'tuts-crm' ),
-					'add_new'            => _x( 'Add New', 'contact', 'tuts-crm' ),
-					'add_new_item'       => __( 'Add New Contact', 'tuts-crm' ),
-					'new_item'           => __( 'New Contact', 'tuts-crm' ),
-					'edit_item'          => __( 'Edit Contact', 'tuts-crm' ),
-					'view_item'          => __( 'View Contact', 'tuts-crm' ),
-					'all_items'          => __( 'All Contacts', 'tuts-crm' ),
-					'search_items'       => __( 'Search Contacts', 'tuts-crm' ),
-					'parent_item_colon'  => __( 'Parent Contacts:', 'tuts-crm' ),
-					'not_found'          => __( 'No contacts found.', 'tuts-crm' ),
-					'not_found_in_trash' => __( 'No contacts found in Trash.', 'tuts-crm' ),
+					'name'               => _x( 'Contacts', 'post type general name', 'sc-crm' ),
+					'singular_name'      => _x( 'Contact', 'post type singular name', 'sc-crm' ),
+					'menu_name'          => _x( 'Contacts', 'admin menu', 'sc-crm' ),
+					'name_admin_bar'     => _x( 'Contact', 'add new on admin bar', 'sc-crm' ),
+					'add_new'            => _x( 'Add New', 'contact', 'sc-crm' ),
+					'add_new_item'       => __( 'Add New Contact', 'sc-crm' ),
+					'new_item'           => __( 'New Contact', 'sc-crm' ),
+					'edit_item'          => __( 'Edit Contact', 'sc-crm' ),
+					'view_item'          => __( 'View Contact', 'sc-crm' ),
+					'all_items'          => __( 'All Contacts', 'sc-crm' ),
+					'search_items'       => __( 'Search Contacts', 'sc-crm' ),
+					'parent_item_colon'  => __( 'Parent Contacts:', 'sc-crm' ),
+					'not_found'          => __( 'No contacts found.', 'sc-crm' ),
+					'not_found_in_trash' => __( 'No contacts found in Trash.', 'sc-crm' ),
 				),
 				// Front-end
 				'has-archive'        => true,
@@ -80,7 +85,45 @@
 				),
 			) );
 		}
+		
 		// End method sc_register_custom_post_type
+		
+		
+		/**
+		 * Registers a Custom Taxonomy called companies
+		 */
+		public function sc_register_custom_taxonomy_companies() {
+			$labels = [
+				'name'              => __( 'Companies', 'sc-crm' ),
+				'singular_name'     => __( 'Company', 'sc-crm' ),
+				'search_items'      => __( 'Search Companies' ),
+				'all_items'         => __( 'All Companies' ),
+				'parent_item'       => __( 'Parent Company' ),
+				'parent_item_colon' => __( 'Parent Company:' ),
+				'edit_item'         => __( 'Edit Company' ),
+				'update_item'       => __( 'Update Company' ),
+				'add_new_item'      => __( 'Add New Company' ),
+				'new_item_name'     => __( 'New Company Name' ),
+				'menu_name'         => __( 'Company' ),
+			];
+			$args   = [
+				'hierarchical'      => true,
+				'labels'            => $labels,
+				'show_ui'           => true,
+				'show_admin_cloumn' => true,
+				'query_var'         => true,
+				'rewrite'           => [ 'slug' => 'companies' ],
+				'capabilities'      => array(
+					'manage_terms' => 'manage_companies',
+					'edit_terms'   => 'edit_companies',
+					'delete_terms' => 'delete_companies',
+					'assign_terms' => 'assign_companies',
+				)
+			];
+			
+			register_taxonomy( 'companies', [ 'contact' ], $args );
+		}
+		//End Method sc_register_custom_taxonomy_companies
 		
 		
 		/**
@@ -104,6 +147,10 @@
 				'read_contact'              => true,
 				'delete_contact'            => true,
 				'read'                      => true,
+				'manage_companies'          => true,
+				'edit_companies'            => true,
+				'delete_companies'          => true,
+				'assign_companies'          => true
 			);
 			
 			// Create CRM role and assign the custom capabilities to it
