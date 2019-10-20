@@ -20,11 +20,13 @@
 		 * ScCrm constructor.
 		 */
 		public function __construct() {
-			add_action( 'init', array( $this, 'sc_register_custom_post_type' ) );
-			add_action( 'init', array( $this, 'sc_register_custom_taxonomy_companies' ) );
-			register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
-			register_deactivation_hook( __FILE__, array( $this, 'plugin_deactivation' ) );
-			add_action( 'plugins_loaded', array( $this, 'sc_load_text_domain' ) );
+			
+			add_action( 'init', [ $this, 'sc_register_custom_post_type' ] );
+			add_action( 'init', [ $this, 'sc_register_custom_taxonomy_companies' ] );
+			add_action( 'init', [ $this, 'load_require_file' ] );
+			register_activation_hook( __FILE__, [ $this, 'plugin_activation' ] );
+			register_deactivation_hook( __FILE__, [ $this, 'plugin_deactivation' ] );
+			add_action( 'plugins_loaded', [ $this, 'sc_load_text_domain' ] );
 		}
 		//End method construct
 		
@@ -33,8 +35,8 @@
 		 * Registers a Custom Post Type called contact
 		 */
 		public function sc_register_custom_post_type() {
-			register_post_type( 'contact', array(
-				'labels'             => array(
+			register_post_type( 'contact', [
+				'labels'             => [
 					'name'               => _x( 'Contacts', 'post type general name', 'sc-crm' ),
 					'singular_name'      => _x( 'Contact', 'post type singular name', 'sc-crm' ),
 					'menu_name'          => _x( 'Contacts', 'admin menu', 'sc-crm' ),
@@ -49,14 +51,14 @@
 					'parent_item_colon'  => __( 'Parent Contacts:', 'sc-crm' ),
 					'not_found'          => __( 'No contacts found.', 'sc-crm' ),
 					'not_found_in_trash' => __( 'No contacts found in Trash.', 'sc-crm' ),
-				),
+				],
 				// Front-end
 				'has-archive'        => true,
 				'public'             => true,
 				'publicly_queryable' => false,
 				
 				// Admin
-				'capabilities'       => array(
+				'capabilities'       => [
 					'edit_others_posts'      => 'edit_others_contacts',
 					'delete_others_posts'    => 'delete_others_contacts',
 					'delete_private_posts'   => 'delete_private_contacts',
@@ -70,7 +72,7 @@
 					'edit_post'              => 'edit_contact',
 					'read_post'              => 'read_contact',
 					'delete_post'            => 'delete_contact',
-				),
+				],
 				
 				'map_meta_cap'  => true,
 				'menu_icon'     => 'dashicons-businessman',
@@ -78,12 +80,12 @@
 				'query_var'     => true,
 				'show_in_menu'  => true,
 				'show_ui'       => true,
-				'supports'      => array(
+				'supports'      => [
 					'title',
 					'editor',
 					'thumbnail'
-				),
-			) );
+				],
+			] );
 		}
 		
 		// End method sc_register_custom_post_type
@@ -113,12 +115,12 @@
 				'show_admin_cloumn' => true,
 				'query_var'         => true,
 				'rewrite'           => [ 'slug' => 'companies' ],
-				'capabilities'      => array(
+				'capabilities'      => [
 					'manage_terms' => 'manage_companies',
 					'edit_terms'   => 'edit_companies',
 					'delete_terms' => 'delete_companies',
 					'assign_terms' => 'assign_companies',
-				)
+				]
 			];
 			
 			register_taxonomy( 'companies', [ 'contact' ], $args );
@@ -132,7 +134,7 @@
 		public function plugin_activation() {
 			
 			// Define our custom capabilities
-			$customCaps = array(
+			$customCaps = [
 				'edit_others_contacts'      => true,
 				'delete_others_contacts'    => true,
 				'delete_private_contacts'   => true,
@@ -151,7 +153,7 @@
 				'edit_companies'            => true,
 				'delete_companies'          => true,
 				'assign_companies'          => true
-			);
+			];
 			
 			// Create CRM role and assign the custom capabilities to it
 			add_role( 'crm', __( 'CRM', 'sc-crm' ), $customCaps );
@@ -197,6 +199,17 @@
 		}
 		//end method plugin_deactivation
 		
+		
+		/**
+		 *
+		 */
+		public function load_require_file() {
+			if ( file_exists( dirname( __FILE__ ) . '/inc/tax-meta.php' ) ) {
+				require_once( dirname( __FILE__ ) . '/inc/tax-meta.php' );
+			}
+			
+		}
+		//End method ClassInitiate
 		
 		/**
 		 * Load text domain
